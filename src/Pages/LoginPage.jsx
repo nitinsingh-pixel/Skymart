@@ -3,12 +3,13 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router";
 import { toast } from "react-toastify";
 
-import { Mail, Lock, Eye, EyeOff, Zap, ArrowRight } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Zap, ArrowRight, AlertCircle } from "lucide-react";
 import { Auth } from "../Context/AuthContext";
 
 const LoginPage = () => {
   const { registeredUsers, setLoggedInUser } = useContext(Auth);
   const [showPassword, setShowPassword] = useState(false);
+  const [authError, setAuthError] = useState("");
   const navigate = useNavigate();
 
   const {
@@ -19,13 +20,14 @@ const LoginPage = () => {
   } = useForm();
 
   const formSubmit = (data) => {
+    setAuthError("");
+
     const user = registeredUsers.find(
       (val) => val.email === data.email && val.password === data.password
     );
 
     if (!user) {
-      toast.error("Invalid credentials or user not found");
-      reset();
+      setAuthError("Invalid email or password");
       return;
     }
 
@@ -38,13 +40,10 @@ const LoginPage = () => {
 
   return (
     <div className="min-h-screen bg-[#0d0d0e] text-white flex flex-col lg:flex-row font-sans selection:bg-[#ccff00] selection:text-black">
-     
       <div className="w-full lg:w-1/2 p-8 lg:p-16 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-zinc-800/80 relative overflow-hidden bg-gradient-to-br from-zinc-900 via-[#0d0d0e] to-black">
-       
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#ccff00]/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-[#ccff00]/5 rounded-full blur-3xl pointer-events-none" />
 
-       
         <div className="flex items-center space-x-3 z-10">
           <div className="w-10 h-10 bg-[#ccff00] rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(204,255,0,0.4)]">
             <Zap className="w-6 h-6 text-black fill-black" />
@@ -54,7 +53,6 @@ const LoginPage = () => {
           </span>
         </div>
 
-        
         <div className="my-12 lg:my-0 space-y-6 max-w-lg z-10">
           <span className="inline-block px-3 py-1 text-xs font-bold uppercase tracking-widest text-[#ccff00] bg-[#ccff00]/10 rounded-full border border-[#ccff00]/20">
             Welcome Back
@@ -70,7 +68,6 @@ const LoginPage = () => {
           </p>
         </div>
 
-       
         <div className="grid grid-cols-3 gap-4 z-10">
           <div className="p-4 rounded-xl border border-zinc-800 bg-zinc-900/40 backdrop-blur-md text-center hover:border-zinc-700 transition">
             <h3 className="text-xl sm:text-2xl font-bold text-[#ccff00]">20K+</h3>
@@ -87,16 +84,21 @@ const LoginPage = () => {
         </div>
       </div>
 
-     
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 relative bg-[#09090a]">
-        <div className="w-full max-w-md bg-zinc-900/60 border border-zinc-800 backdrop-blur-xl rounded-2xl p-8 sm:p-10 shadow-2xl transition-all duration-300 hover:shadow-[0_10px_30px_rgba(204,255,0,0.05)] hover:-translate-y-1">
-          <div className="mb-8">
+        <div className="w-full max-w-md bg-zinc-900/60 border border-zinc-800 backdrop-blur-xl rounded-2xl p-8 sm:p-10 shadow-2xl transition-all duration-300 hover:shadow-[0_10px_30px_rgba(204,255,0,0.05)]">
+          <div className="mb-6">
             <h2 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">Sign in</h2>
             <p className="text-zinc-400 text-sm mt-1">Enter your credentials to continue</p>
           </div>
 
+          {authError && (
+            <div className="mb-6 px-4 py-3 rounded-xl bg-[#2a1215] border border-red-900/60 text-red-400 text-sm font-medium flex items-center gap-2 animate-fadeIn">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{authError}</span>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit(formSubmit)} className="space-y-5">
-           
             <div className="space-y-2">
               <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400">
                 Email Address
@@ -111,6 +113,7 @@ const LoginPage = () => {
                       message: "Invalid email address",
                     },
                   })}
+                  onChange={() => setAuthError("")}
                   type="email"
                   placeholder="name@example.com"
                   className="w-full pl-12 pr-4 py-3 bg-zinc-950/80 border border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-[#ccff00] focus:ring-1 focus:ring-[#ccff00] transition duration-200"
@@ -121,7 +124,6 @@ const LoginPage = () => {
               )}
             </div>
 
-        
             <div className="space-y-2">
               <label className="block text-xs font-semibold uppercase tracking-wider text-zinc-400">
                 Password
@@ -136,6 +138,7 @@ const LoginPage = () => {
                       message: "Minimum 6 characters required",
                     },
                   })}
+                  onChange={() => setAuthError("")}
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
                   className="w-full pl-12 pr-12 py-3 bg-zinc-950/80 border border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:outline-none focus:border-[#ccff00] focus:ring-1 focus:ring-[#ccff00] transition duration-200"
@@ -153,7 +156,6 @@ const LoginPage = () => {
               )}
             </div>
 
-          
             <button
               type="submit"
               disabled={isSubmitting}
@@ -164,7 +166,6 @@ const LoginPage = () => {
             </button>
           </form>
 
-         
           <div className="mt-8 text-center text-sm text-zinc-400">
             Don't have an account?{" "}
             <button
